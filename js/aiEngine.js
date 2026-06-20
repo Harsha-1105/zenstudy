@@ -131,7 +131,8 @@ window.AIEngine = {
      * Live Journal Analysis using Gemini API
      */
     analyzeWithGemini: async function(apiKey, text, exam) {
-        const systemPrompt = `You are ZenStudy, an expert empathetic AI mental well-being companion for students preparing for high-stakes tests (currently preparing for ${exam}).
+        if (apiKey) {
+            const systemPrompt = `You are ZenStudy, an expert empathetic AI mental well-being companion for students preparing for high-stakes tests (currently preparing for ${exam}).
 Analyze the following student daily journal log:
 "${text}"
 
@@ -151,37 +152,75 @@ You MUST respond strictly in the following JSON format:
   "feedbackText": "Empathetic tailored strategy here..."
 }`;
 
-        const rawResult = await this.queryGemini(apiKey, systemPrompt);
-        
-        // Sanitize response in case LLM wraps it in markdown code blocks
-        let cleanJsonStr = rawResult.trim();
-        if (cleanJsonStr.startsWith("```")) {
-            cleanJsonStr = cleanJsonStr.replace(/^```json\s*/, '').replace(/```$/, '').trim();
-        }
+            const rawResult = await this.queryGemini(apiKey, systemPrompt);
+            
+            // Sanitize response in case LLM wraps it in markdown code blocks
+            let cleanJsonStr = rawResult.trim();
+            if (cleanJsonStr.startsWith("```")) {
+                cleanJsonStr = cleanJsonStr.replace(/^```json\s*/, '').replace(/```$/, '').trim();
+            }
 
-        const parsed = JSON.parse(cleanJsonStr);
-        return {
-            stress: Number(parsed.stress) || 50,
-            burnout: Number(parsed.burnout) || 50,
-            doubt: Number(parsed.doubt) || 50,
-            feedbackTitle: parsed.feedbackTitle || "AI Wellness Reflection",
-            feedbackText: parsed.feedbackText || "Keep moving forward, one step at a time.",
-            timestamp: new Date().toISOString()
-        };
+            const parsed = JSON.parse(cleanJsonStr);
+            return {
+                stress: Number(parsed.stress) || 50,
+                burnout: Number(parsed.burnout) || 50,
+                doubt: Number(parsed.doubt) || 50,
+                feedbackTitle: parsed.feedbackTitle || "AI Wellness Reflection",
+                feedbackText: parsed.feedbackText || "Keep moving forward, one step at a time.",
+                timestamp: new Date().toISOString()
+            };
+        } else {
+            // Route through Flask local backend
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text, exam })
+            });
+
+            if (!response.ok) {
+                throw new Error("Local backend analysis failed or server is offline");
+            }
+            return await response.json();
+        }
     },
 
     /**
      * Get chatbot response from Gemini
      */
     getCompanionChat: async function(apiKey, history, companionName, companionPrompt, exam, latestUserMessage) {
-        const prompt = `You are ${companionName}, a supportive AI chatbot companion for a student preparing for the ${exam} exam.
+        if (apiKey) {
+            const prompt = `You are ${companionName}, a supportive AI chatbot companion for a student preparing for the ${exam} exam.
 Your profile/role instructions: "${companionPrompt}"
 Here is the conversation history:
 ${history.map(h => `${h.sender.toUpperCase()}: ${h.text}`).join('\n')}
 USER: ${latestUserMessage}
 
 Give a warm, personalized, contextual reply (max 100 words). Be empathetic, offer direct coping/focus tips, and ask a supporting follow-up. Do not sound generic.`;
-        
-        return await this.queryGemini(apiKey, prompt);
+            
+            return await this.queryGemini(apiKey, prompt);
+        } else {
+            // Route through Flask local backend
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    history,
+                    companionName,
+                    companionPrompt,
+                    exam,
+                    latestUserMessage
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Local backend chat failed or server is offline");
+            }
+            const data = await response.json();
+            return data.reply;
+        }
     }
 };
