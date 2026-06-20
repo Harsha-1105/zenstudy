@@ -51,23 +51,38 @@ window.AppState = {
         const local = localStorage.getItem('zenstudy_state');
         if (local) {
             try {
-                this._state = JSON.parse(local);
-                // Backwards compatibility safety checks
-                if (this._state.settings.pinEnabled === undefined) {
-                    this._state.settings.pinEnabled = false;
+                const parsed = JSON.parse(local);
+                
+                // Backwards compatibility safety checks for top-level keys
+                if (!parsed.settings) parsed.settings = {};
+                if (!parsed.logs) parsed.logs = [];
+                if (!parsed.chats) parsed.chats = { aria: [], leo: [], sia: [] };
+                if (!parsed.plannerTasks) parsed.plannerTasks = [];
+                
+                // Backwards compatibility for nested settings
+                if (parsed.settings.name === undefined) parsed.settings.name = "Aarav Sharma";
+                if (parsed.settings.exam === undefined) parsed.settings.exam = "JEE";
+                if (parsed.settings.examDate === undefined) {
+                    const defaultDate = new Date();
+                    defaultDate.setMonth(defaultDate.getMonth() + 10);
+                    parsed.settings.examDate = defaultDate.toISOString().split('T')[0];
                 }
-                if (this._state.settings.pinHash === undefined) {
-                    this._state.settings.pinHash = "";
-                }
-                if (!this._state.achievements) {
-                    this._state.achievements = {
-                        journalCount: this._state.logs ? this._state.logs.length : 0,
-                        journalStreak: this._state.logs ? Math.min(this._state.logs.length, 3) : 0,
+                if (parsed.settings.geminiKey === undefined) parsed.settings.geminiKey = "";
+                if (parsed.settings.pinEnabled === undefined) parsed.settings.pinEnabled = false;
+                if (parsed.settings.pinHash === undefined) parsed.settings.pinHash = "";
+                
+                // Backwards compatibility for achievements
+                if (!parsed.achievements) {
+                    parsed.achievements = {
+                        journalCount: parsed.logs ? parsed.logs.length : 0,
+                        journalStreak: parsed.logs ? Math.min(parsed.logs.length, 3) : 0,
                         breathCount: 1,
-                        taskCount: this._state.plannerTasks ? this._state.plannerTasks.filter(t => t.completed).length : 0,
+                        taskCount: parsed.plannerTasks ? parsed.plannerTasks.filter(t => t.completed).length : 0,
                         sosCount: 0
                     };
                 }
+                
+                this._state = parsed;
                 return;
             } catch (e) {
                 console.error("Failed to parse local state, re-initializing:", e);
