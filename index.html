@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenStudy | AI Exam Well-being & Stress Companion</title>
+    <meta name="description" content="ZenStudy is an AI-powered mental well-being companion for students preparing for high-stakes exams like JEE, NEET, GATE, CAT, and Board Exams. Monitor stress, log mood, practice adaptive mindfulness, and chat with your digital companion.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+    <!-- Privacy PIN Lock Screen Overlay -->
+    <div class="pin-backdrop hidden" id="pin-lock-screen" role="dialog" aria-modal="true" aria-labelledby="pin-screen-title">
+        <div class="pin-card">
+            <div class="pin-lock-icon">
+                <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h2 id="pin-screen-title">Journal Locked</h2>
+            <p class="pin-desc">Enter your 4-digit well-being PIN to unlock access.</p>
+            
+            <div class="pin-dots-container">
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+            </div>
+            
+            <div class="pin-keypad">
+                <button class="pin-key" data-val="1">1</button>
+                <button class="pin-key" data-val="2">2</button>
+                <button class="pin-key" data-val="3">3</button>
+                <button class="pin-key" data-val="4">4</button>
+                <button class="pin-key" data-val="5">5</button>
+                <button class="pin-key" data-val="6">6</button>
+                <button class="pin-key" data-val="7">7</button>
+                <button class="pin-key" data-val="8">8</button>
+                <button class="pin-key" data-val="9">9</button>
+                <button class="pin-key secondary-key" data-val="clear">Clear</button>
+                <button class="pin-key" data-val="0">0</button>
+                <button class="pin-key secondary-key" data-val="back">⌫</button>
+            </div>
+            <div class="pin-error-msg hidden" id="pin-error-label">Incorrect PIN. Try again.</div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" aria-label="Main Navigation">
+            <div class="logo-area">
+                <svg class="logo-icon" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    <path d="M2 12h20"></path>
+                </svg>
+                <span class="logo-text">ZenStudy</span>
+            </div>
+            
+            <div class="profile-card">
+                <div class="profile-avatar" id="profile-avatar-display">JS</div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profile-name-display">Aarav Sharma</div>
+                    <div class="profile-exam-tag" id="profile-exam-display">JEE Aspirant</div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" id="nav-dashboard" data-page="dashboard" aria-label="Go to Dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" id="nav-journal" data-page="journal" aria-label="Go to Journal">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>Daily Journal</span>
+                </button>
+                <button class="nav-item" id="nav-companion" data-page="companion" aria-label="Go to ZenAI Companion">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>ZenAI Chat</span>
+                </button>
+                <button class="nav-item" id="nav-mindfulness" data-page="mindfulness" aria-label="Go to Mindful Zone">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 8v8"></path>
+                        <path d="M8 12h8"></path>
+                    </svg>
+                    <span>Mindful Zone</span>
+                </button>
+                <button class="nav-item" id="nav-settings" data-page="settings" aria-label="Go to Settings">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sos-card">
+                    <h4>Feeling Panic?</h4>
+                    <p>Trigger instant calm-down sequence</p>
+                    <button class="sos-btn" id="sos-trigger" aria-label="Trigger emergency calm down">SOS Grounding</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content-area">
+            <!-- Content will be injected dynamically by app.js -->
+            <div id="page-content"></div>
+        </main>
+    </div>
+
+    <!-- Floating Panic / Grounding Modal -->
+    <div class="modal-backdrop hidden" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
+        <div class="modal-card sos-modal-card">
+            <button class="modal-close-btn" id="close-sos-modal" aria-label="Close modal">&times;</button>
+            <h2 id="sos-modal-title">Emergency Calm Down (5-4-3-2-1 Grounding)</h2>
+            <p class="sos-desc">Take a deep breath. Let's redirect your focus and bring your awareness back to the present moment to break the panic cycle.</p>
+            
+            <div class="grounding-flow">
+                <div class="grounding-step active" data-step="5">
+                    <div class="grounding-num">5</div>
+                    <div class="grounding-text">
+                        <h3>Things you can SEE</h3>
+                        <p>Look around and identify 5 distinct objects near you. Focus on their shapes, colors, or textures.</p>
+                    </div>
+                </div>
+                <div class="grounding-step" data-step="4">
+                    <div class="grounding-num">4</div>
+                    <div class="grounding-text">
+                        <h3>Things you can TOUCH</h3>
+                        <p>Feel 4 things around you. Your clothes, the desk, the chair, or the cool air on your face.</p>
+                    </div>
+                </div>
+                <div class="grounding-step" data-step="3">
+                    <div class="grounding-num">3</div>
+                    <div class="grounding-text">
+                        <h3>Things you can HEAR</h3>
+                        <p>Listen for 3 distinct sounds. The hum of a fan, birds chirping outside, or traffic in the distance.</p>
+                    </div>
+                </div>
+                <div class="grounding-step" data-step="2">
+                    <div class="grounding-num">2</div>
+                    <div class="grounding-text">
+                        <h3>Things you can SMELL</h3>
+                        <p>Notice 2 things you can smell. The scent of paper, coffee, pencil lead, or fresh air.</p>
+                    </div>
+                </div>
+                <div class="grounding-step" data-step="1">
+                    <div class="grounding-num">1</div>
+                    <div class="grounding-text">
+                        <h3>Thing you can TASTE</h3>
+                        <p>Focus on 1 thing you can taste. Take a sip of water, or focus on the current taste in your mouth.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="sos-prev-btn" disabled>Previous</button>
+                <button class="btn btn-primary" id="sos-next-btn">Next Step</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script imports -->
+    <script src="js/aiEngine.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/journal.js"></script>
+    <script src="js/companion.js"></script>
+    <script src="js/mindfulness.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

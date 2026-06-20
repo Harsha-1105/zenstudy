@@ -1,0 +1,11 @@
+# Editor configuration directories
+.vscode/
+.idea/
+
+# Operating system files
+Thumbs.db
+.DS_Store
+
+# Temporary files & logs
+*.log
+.system_generated/
