@@ -182,12 +182,13 @@ window.Companion = {
         const state = window.AppState.get();
         const exam = state.settings.exam || "JEE";
         const apiKey = state.settings.geminiKey;
+        const backendUrl = state.settings.backendUrl;
         const history = state.chats[this.selectedCompanion] || [];
 
         let replyText = "";
 
         try {
-            if (apiKey) {
+            if (apiKey || backendUrl) {
                 // Call Gemini Live API
                 replyText = await window.AIEngine.getCompanionChat(
                     apiKey, 

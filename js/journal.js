@@ -135,11 +135,12 @@ window.Journal = {
         const state = window.AppState.get();
         const examName = state.settings.exam || "JEE";
         const apiKey = state.settings.geminiKey;
+        const backendUrl = state.settings.backendUrl;
 
         let analysisResult;
 
         try {
-            if (apiKey) {
+            if (apiKey || backendUrl) {
                 // Query actual Gemini model
                 analysisResult = await window.AIEngine.analyzeWithGemini(apiKey, logText, examName);
             } else {
