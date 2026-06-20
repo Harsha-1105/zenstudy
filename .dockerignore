@@ -1,0 +1,9 @@
+.git/
+.gitignore
+.vscode/
+.idea/
+.system_generated/
+*.log
+__pycache__/
+Dockerfile
+README.md
