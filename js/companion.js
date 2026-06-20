@@ -189,15 +189,22 @@ window.Companion = {
 
         try {
             if (apiKey || backendUrl) {
-                // Call Gemini Live API
-                replyText = await window.AIEngine.getCompanionChat(
-                    apiKey, 
-                    history.slice(-10), // Limit history length context
-                    activeComp.name, 
-                    activeComp.prompt, 
-                    exam, 
-                    text
-                );
+                try {
+                    // Call Gemini Live API
+                    replyText = await window.AIEngine.getCompanionChat(
+                        apiKey, 
+                        history.slice(-10), // Limit history length context
+                        activeComp.name, 
+                        activeComp.prompt, 
+                        exam, 
+                        text
+                    );
+                } catch (apiError) {
+                    console.warn("AI Companion failed, falling back to local chat:", apiError);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    replyText = this.generateLocalMockReply(text, this.selectedCompanion, exam);
+                    replyText += " (Note: Running in local backup mode due to server connectivity issues).";
+                }
             } else {
                 // Mock smart response locally
                 await new Promise(resolve => setTimeout(resolve, 1000));

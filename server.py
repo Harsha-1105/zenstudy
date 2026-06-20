@@ -238,11 +238,11 @@ Give a warm, personalized, contextual reply (max 100 words). Be empathetic, offe
 
 @app.route('/')
 def serve_index():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(app.root_path, 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('.', path)
+    return send_from_directory(app.root_path, path)
 
 if __name__ == '__main__':
     # Retrieve port from env (Vercel/Render support) or default to 8000

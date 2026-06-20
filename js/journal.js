@@ -141,8 +141,17 @@ window.Journal = {
 
         try {
             if (apiKey || backendUrl) {
-                // Query actual Gemini model
-                analysisResult = await window.AIEngine.analyzeWithGemini(apiKey, logText, examName);
+                try {
+                    // Query actual Gemini model
+                    analysisResult = await window.AIEngine.analyzeWithGemini(apiKey, logText, examName);
+                } catch (apiError) {
+                    console.warn("AI Engine failed, falling back to local analysis:", apiError);
+                    // Fallback to local heuristic parsing after small delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    analysisResult = window.AIEngine.analyzeLocally(logText, examName);
+                    // Append a small note that it's local fallback
+                    analysisResult.feedbackText += " (Note: Using local backup reflection engine due to connection issues).";
+                }
             } else {
                 // Fallback to local heuristic parsing after simulated delay for dramatic effect
                 await new Promise(resolve => setTimeout(resolve, 1500));
