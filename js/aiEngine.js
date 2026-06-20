@@ -171,7 +171,9 @@ You MUST respond strictly in the following JSON format:
             };
         } else {
             // Route through Flask local backend
-            const response = await fetch('/api/analyze', {
+            const state = window.AppState.get();
+            const baseUrl = state.settings.backendUrl ? state.settings.backendUrl.replace(/\/$/, '') : '';
+            const response = await fetch(`${baseUrl}/api/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -202,7 +204,9 @@ Give a warm, personalized, contextual reply (max 100 words). Be empathetic, offe
             return await this.queryGemini(apiKey, prompt);
         } else {
             // Route through Flask local backend
-            const response = await fetch('/api/chat', {
+            const state = window.AppState.get();
+            const baseUrl = state.settings.backendUrl ? state.settings.backendUrl.replace(/\/$/, '') : '';
+            const response = await fetch(`${baseUrl}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -91,6 +91,10 @@ window.Settings = {
                         <label for="gemini-key">Google Gemini API Key (Optional)</label>
                         <input type="password" id="gemini-key" class="form-control" value="${settings.geminiKey || ''}" placeholder="AIzaSy..." />
                     </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label for="backend-url">Backend Server URL (Optional)</label>
+                        <input type="url" id="backend-url" class="form-control" value="${window.escapeHTML(settings.backendUrl || '')}" placeholder="https://zenstudy-xxxx-uc.a.run.app" />
+                    </div>
                 </div>
 
                 <!-- Action buttons -->
@@ -133,12 +137,14 @@ window.Settings = {
         const keyInput = document.getElementById('gemini-key');
         const pinToggle = document.getElementById('pin-lock-toggle');
         const pinVal = document.getElementById('pin-lock-value');
+        const backendInput = document.getElementById('backend-url');
 
         const name = nameInput ? nameInput.value.trim() : 'Student';
         const date = dateInput ? dateInput.value : '';
         const key = keyInput ? keyInput.value.trim() : '';
         const pinEnabled = pinToggle ? pinToggle.checked : false;
         const pinHash = pinVal ? pinVal.value.trim() : '';
+        const backendUrl = backendInput ? backendInput.value.trim() : '';
 
         // Validate PIN settings
         if (pinEnabled && pinHash.length !== 4) {
@@ -153,7 +159,8 @@ window.Settings = {
             examDate: date,
             geminiKey: key,
             pinEnabled: pinEnabled,
-            pinHash: pinHash
+            pinHash: pinHash,
+            backendUrl: backendUrl
         });
 
         // Trigger updates in sidebar elements

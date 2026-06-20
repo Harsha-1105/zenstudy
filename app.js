@@ -29,7 +29,8 @@ window.AppState = {
             examDate: "", // Computed dynamically on load if empty
             geminiKey: "",
             pinEnabled: false,
-            pinHash: ""
+            pinHash: "",
+            backendUrl: ""
         },
         logs: [],
         chats: {
@@ -70,6 +71,7 @@ window.AppState = {
                 if (parsed.settings.geminiKey === undefined) parsed.settings.geminiKey = "";
                 if (parsed.settings.pinEnabled === undefined) parsed.settings.pinEnabled = false;
                 if (parsed.settings.pinHash === undefined) parsed.settings.pinHash = "";
+                if (parsed.settings.backendUrl === undefined) parsed.settings.backendUrl = "";
                 
                 // Backwards compatibility for achievements
                 if (!parsed.achievements) {

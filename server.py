@@ -13,6 +13,13 @@ except ImportError:
 
 app = Flask(__name__, static_folder='.')
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS,PUT,DELETE"
+    return response
+
 # Retrieve API Key from Environment
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
@@ -137,8 +144,10 @@ def call_gemini_api(api_key, prompt_text):
 
 # --- Flask Server Endpoints ---
 
-@app.route('/api/analyze', methods=['POST'])
+@app.route('/api/analyze', methods=['POST', 'OPTIONS'])
 def analyze_journal():
+    if request.method == 'OPTIONS':
+        return '', 200
     data = request.get_json() or {}
     text = data.get("text", "")
     exam = data.get("exam", "JEE")
@@ -190,8 +199,10 @@ You MUST respond strictly in the following JSON format:
         # Run local parser
         return jsonify(analyze_locally(text, exam))
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat_companion():
+    if request.method == 'OPTIONS':
+        return '', 200
     data = request.get_json() or {}
     history = data.get("history", [])
     companion_name = data.get("companionName", "Aria")
